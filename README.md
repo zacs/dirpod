@@ -20,7 +20,14 @@ This will generate the RSS file, which will be output into that same `dirwithmp3
 
 The `channel.json` file is the only place to specify configuration information, some of which is mandatory. See `samples/channel.json` for a fully documented example of the config.
 
-### Require Config Values
+NOTE: The data within the ID3 tags will override the values defined in the `channel.json` file. The ID3 mapping for the RSS items would be:
+
+    title => title
+    artist => author
+    album art => image (only the image for the single episode)
+    genre => category (in addition to categories specified in channel.json)
+
+### Required Config Values
 
 It is required to at least specify a few values in the `channel.json`. They are the following:
 

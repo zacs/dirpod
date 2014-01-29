@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 from mutagen.easyid3 import EasyID3
+from mutagen.mp3 import MP3
 import arrow
 import os.path
+import time
 
 
 class Episode:
@@ -14,45 +16,32 @@ class Episode:
     values divined from the mp3's ID3 tag data.
     """
 
-    def __init__(self, path, metadata=""):
+    def __init__(self, path, metadata):
         # Initialization vars
         self.path = path
         self.metadata = metadata
 
         # Internal vars
-        #self.date = arrow()
         self.title = ""
-        self.album = ""
         self.artist = ""
-        self.genre = ""
+        self.categories = []
         self.date = arrow.now()
+        self.duration = None
 
         # Instantiate the class
-        self.addTagData()
+        self.addDataFromTags()
 
-    def addTagData(self):
+    def addDataFromTags(self):
         mp3info = EasyID3(self.path)
+        mp3file = MP3(self.path)
 
         try:
-            self.title = mp3info["title"]
+            self.author = mp3info["artist"][0]
         except:
-            print "no id3 title"
-            # Use static title from the channel.json
+            print "no id3 artist, pull author from channel.json"
 
         try:
-            self.artist = mp3info["artist"]
-        except:
-            print "no id3 artist"
-            # Use static artist from the channel.json
-
-        try:
-            self.album = mp3info["album"]
-        except:
-            print "no id3 album"
-            # Use static album from the channel.json
-
-        try:
-            self.genre = mp3info["genre"]
+            self.categories.append(mp3info["genre"][0])
         except KeyError:
             print "no id3 genre"
             # Use static genre from the channel.json
@@ -61,28 +50,32 @@ class Episode:
             pass
 
         try:
-            self.date = mp3info["date"]
-        except KeyError:
             self.date = arrow.get(os.path.getctime(self.path))
-            print "no id3 date, let's use file creation time"
-            # Use static title from the channel.json
-        else:
-            # Use the date that was set at instantiation time ("now")
-            print "just use today's date, as a final fallback"
-            pass
+        except:
+            print "just use today's date, as a weird fallback"
 
-        print mp3info.items()
+        try:
+            self.title = mp3info["title"][0]
+        except:
+            print "no id3 title"
+            # Use static title (show name + date) from the channel.json
+
+        try:
+            self.duration = time.strftime('%H:%M:%S', time.gmtime(mp3file.info.length))
+        except:
+            self.duration = None
+
+        #print mp3info.items()
+        #print mp3file.info.length
         pass
 
     def episodeToDict(self):
         print self.title
-        print self.album
-        print self.artist
-        print self.genre
+        print self.author
+        print self.categories
         print self.date
-        print self.date.humanize()
+        print self.duration
         pass
 
 if __name__ == '__main__':
-    foo = Episode("/Users/zac/Code/scratch/groce_sample.mp3")
-    foo.episodeToDict()
+    print "Probably shouldn't be calling Episode on its own"
