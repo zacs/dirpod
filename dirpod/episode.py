@@ -37,19 +37,19 @@ class Episode:
         try:
             mp3info = EasyID3(self.path)
         except ID3NoHeaderError:
-            print "no ID3 data present"
+            #print "no ID3 data present"
             mp3info = None
         except:
             print "unknown error loading ID3 data"
 
         mp3file = MP3(self.path)
-        # should probably clear the track number if we're okay writing to the mp3
+        # should probably clear the track number if we're okay writing to mp3
 
         # Get the author from the MP3's artist tag; fallback to metadata author
         try:
             self.author = mp3info["artist"][0]
         except:
-            print "no id3 artist, pull author from channel.json"
+            #print "no id3 artist, pull author from channel.json"
             self.author = self.metadata["author"]
 
         # Add the categories specified in the input metadata
@@ -57,9 +57,8 @@ class Episode:
             metacategories = self.metadata["categories"]
             if not isinstance(metacategories, list):
                 metacategories = [metacategories]
-                print "sup"
+                #print "sup"
             for category in metacategories:
-                print "%s: %s" % (self.path, category)
                 self.categories.append(category)
         except Exception as e:
             print "no categories in json: %s" % str(e)
@@ -75,25 +74,25 @@ class Episode:
             self.date = arrow.get(os.path.getctime(self.path))
         except:
             self.date = arrow.now('US/Central')
-            print "Unable to get file creation time. Using 'now' as fallback."
+            #print "Unable to get file creation time. Using 'now' as fallback."
 
         # Get title from ID3; fallback to "Show Name (Date)"
         try:
             self.title = mp3info["title"][0]
         except:
-            print "no id3 title"
-            self.title = "%s (%s)" % (self.metadata["title"], self.date.format('MMM D, YYYY'))
+            #print "no id3 title"
+            self.title = "%s (%s)" % (self.metadata["title"],
+                                      self.date.format('MMM D, YYYY'))
 
         try:
-            self.duration = time.strftime('%H:%M:%S', time.gmtime(mp3file.info.length))
+            self.duration = time.strftime('%H:%M:%S',
+                                          time.gmtime(mp3file.info.length))
         except:
             self.duration = None
 
-        #print mp3info.items()
-        #print mp3file.info.length
         pass
 
-    def episodeToDict(self):
+    def toDict(self):
         print self.title
         print self.author
         print self.categories

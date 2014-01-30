@@ -1,17 +1,41 @@
 # -*- coding: utf-8 -*-
-from glob import glob
-import json
 import dicttoxml
-import os.path
-from episode import Episode # change this to .episode when it's a package
+from episode import Episode  # change this to .episode when it's a package
 
-allEps = []
-podcastMetadata = json.loads(open('/Users/zac/Code/scratch/fake_pod/channel.json').read())
 
-for filename in glob('/Users/zac/Code/scratch/fake_pod/*.mp3'):
-    allEps.append(Episode(filename, podcastMetadata))
-# now sort the array by their dates
-print "=================================="
-for ep in allEps:
-    ep.episodeToDict()
-    print "---------------------------"
+class Podcast():
+    """docstring for Podcast"""
+    def __init__(self, metadata, files):
+        # Input variables
+        self.metadata = metadata
+        self.files = files
+
+        # Output variable
+        self.episodes = []
+        self.channel = dict()
+
+        # Initialization
+        self.addChannel()
+        self.addItems()
+
+    def addChannel(self):
+        self.channel['title'] = self.metadata['title']
+        self.channel['link'] = self.metadata['url']
+        self.channel['language'] = self.metadata['language']
+        self.channel['description'] = self.metadata['description']
+        self.channel['itunes:subtitle'] = self.metadata['subtitle']
+        self.channel['itunes:author'] = self.metadata['author']
+        self.channel['itunes:summary'] = self.metadata['description']
+        self.channel['itunes:image'] = self.metadata['image_url']
+
+    def addItems(self):
+        for afile in self.files:
+            self.episodes.append({"item": Episode(afile, self.metadata)})
+            #self.episodes.append({"item": Episode(afile, self.metadata).toDict()})
+
+    def xml(self):
+        # Output <rss> shit
+        # dicttoxml channel shit
+        # dicttoxml each self.episodes
+        # output trailing </rss> shit
+        pass
