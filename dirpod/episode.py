@@ -6,6 +6,7 @@ import arrow
 import os.path
 import time
 import logging
+from urllib import quote
 
 
 class Episode:
@@ -29,6 +30,8 @@ class Episode:
         self.categories = []
         self.date = arrow.now()
         self.duration = None
+        self.filename = ""
+        self.filesize = 0
 
         # Instantiate the class
         self.addDataFromTags()
@@ -44,6 +47,12 @@ class Episode:
 
         mp3file = MP3(self.path)
         # should probably clear the track number if we're okay writing to mp3
+
+        # Pull just the filename out of the path
+        self.filename = self.metadata["base_url"] + quote(os.path.basename(self.path))
+
+        # Get mp3 file size
+        self.filesize = os.path.getsize(self.path)
 
         # Get the author from the MP3's artist tag; fallback to metadata author
         try:
@@ -90,14 +99,35 @@ class Episode:
         except:
             self.duration = None
 
+        # In case I ever want to "correct" untagged mp3s. For now we stay
+        # read-only.
+        #if mp3info is None:
+        #    mp3file["TIT2"] = TIT2(encoding=3, text=[self.title])
+        #    mp3file["TPE1"] = TPE1(encoding=3, text=[self.author])
+        #    mp3file.save()
+
         pass
 
-    def toDict(self):
-        print self.title
-        print self.author
-        print self.categories
-        print self.date
-        print self.duration
+    def toXml(self):
+        epXml = '<item><title>%s</title>' \
+                '<itunes:author>%s</itunes:author>' \
+                '<pubDate>%s</pubDate>' \
+                '<itunes:duration>%s</itunes:duration>' \
+                '<guid>%s</guid>' \
+                '<enclosure url="%s" length="%s" type="audio/mpeg"/>' % (
+                    self.title,
+                    self.author,
+                    self.date.to('utc').format('ddd, D MMM YYYY hh:mm:ss')
+                    + ' GMT',
+                    self.duration,
+                    self.filename,
+                    self.filename,
+                    self.filesize
+                )
+        #for category in self.categories:
+        #    epXml...
+        epXml += "</item>"
+        return epXml
         pass
 
 if __name__ == '__main__':

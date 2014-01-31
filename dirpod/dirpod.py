@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from podcast import Podcast
 import os.path
 import json
@@ -13,7 +14,8 @@ podcastMetadata = json.loads(open('/Users/zac/Code/scratch/fake_pod/channel.json
 for filename in glob('/Users/zac/Code/scratch/fake_pod/*.mp3'):
     files.append(filename)
 temp = Podcast(podcastMetadata, files)
+# write temp.toXml() to index.rss
 
 #for ep in temp:
-print temp
-pprint (vars(temp))
+print temp.toXml()
+#pprint (vars(temp))
