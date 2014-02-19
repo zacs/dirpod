@@ -49,7 +49,8 @@ class Episode:
         # should probably clear the track number if we're okay writing to mp3
 
         # Pull just the filename out of the path
-        self.filename = self.metadata["base_url"] + quote(os.path.basename(self.path))
+        self.filename = self.metadata["base_url"] +
+                        quote(os.path.basename(self.path))
 
         # Get mp3 file size
         self.filesize = os.path.getsize(self.path)

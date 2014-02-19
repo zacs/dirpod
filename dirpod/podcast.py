@@ -4,6 +4,7 @@ import arrow
 from urllib import quote
 from cgi import escape
 
+
 class Podcast():
 
     """docstring for Podcast"""
